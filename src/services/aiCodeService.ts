@@ -1,4 +1,3 @@
-
 interface AICodeResponse {
   suggestions: string[];
   errors: Array<{
@@ -31,18 +30,24 @@ interface OpenRouterResponse {
 }
 
 class AICodeService {
-  private olympicCoderKey = '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';
-  private qwenKey = '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';
-  private deepSeekKey = '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';
+  private olympicCoderKey = import.meta.env.VITE_OPENROUTER_OLYMPIC_CODER_KEY;
+  private qwenKey = import.meta.env.VITE_OPENROUTER_QWEN_KEY;
+  private deepSeekKey = import.meta.env.VITE_OPENROUTER_DEEPSEEK_KEY;
   private baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
   private async makeAPICall(apiKey: string, model: string, prompt: string): Promise<string> {
     try {
+      if (!apiKey) {
+        throw new Error('API key is not configured');
+      }
+
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Code Analysis Tool'
         },
         body: JSON.stringify({
           model,
@@ -75,11 +80,17 @@ class AICodeService {
 
   private async makeChatAPICall(apiKey: string, model: string, messages: any[]): Promise<string> {
     try {
+      if (!apiKey) {
+        throw new Error('API key is not configured');
+      }
+
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Code Analysis Tool'
         },
         body: JSON.stringify({
           model,
